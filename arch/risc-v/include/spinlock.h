@@ -29,6 +29,8 @@
 #  include <stdint.h>
 #endif /* __ASSEMBLY__ */
 
+#include <arch/barriers.h>
+
 /* Include RISC-V architecture-specific IRQ definitions (including register
  * save structure and up_irq_save()/up_irq_restore() functions)
  */
@@ -58,9 +60,6 @@
  * instruction complete.
  *
  */
-
-#define SP_DSB() __asm__ __volatile__ ("fence")
-#define SP_DMB() __asm__ __volatile__ ("fence")
 
 /****************************************************************************
  * Public Types

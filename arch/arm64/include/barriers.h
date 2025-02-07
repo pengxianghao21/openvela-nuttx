@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm/src/armv7-a/barriers.h
+ * arch/arm64/include/barriers.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,29 +18,45 @@
  *
  ****************************************************************************/
 
-#ifndef __ARCH_ARM_SRC_ARMV7_A_BARRIERS_H
-#define __ARCH_ARM_SRC_ARMV7_A_BARRIERS_H
+#ifndef ___ARCH_ARM64_INCLUDE_BARRIERS_H
+#define ___ARCH_ARM64_INCLUDE_BARRIERS_H
 
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
+#ifndef __ASSEMBLY__
+
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
 
-/* ARMv7-A memory barriers */
+/* See Arm® Architecture Reference Manual
+ * ARM DDI 0487E.a C6.2.81
+ */
 
-#define arm_dsb(n) __asm__ __volatile__ ("dsb " #n : : : "memory")
-#define arm_dmb(n) __asm__ __volatile__ ("dmb " #n : : : "memory")
-#define arm_isb()  __asm__ __volatile__ ("isb " : : : "memory")
-#define arm_nop()  __asm__ __volatile__ ("nop\n")
-#define arm_sev()  __asm__ __volatile__ ("sev\n")
+#define UP_DSB() __asm__ volatile ("dsb sy" : : : "memory");
 
-#define ARM_DSB()  arm_dsb(15)
-#define ARM_DMB()  arm_dmb(15)
-#define ARM_ISB()  arm_isb()
-#define ARM_NOP()  arm_nop()
-#define ARM_SEV()  arm_sev()
+/* See Arm® Architecture Reference Manual
+ * ARM DDI 0487E.a C6.2.79
+ */
 
-#endif /* __ARCH_ARM_SRC_ARMV7_A_BARRIERS_H */
+#define UP_DMB() __asm__ volatile ("dmb sy" : : : "memory");
+
+/* See Arm® Architecture Reference Manual
+ * ARM DDI 0487E.a C6.2.96
+ */
+
+#define UP_ISB() __asm__ volatile ("isb" : : : "memory");
+
+#define UP_MB() \
+  do            \
+    {           \
+      UP_DSB(); \
+      UP_ISB(); \
+    }           \
+  while (0)
+
+#endif /* __ASSEMBLY__ */
+
+#endif /* ___ARCH_ARM64_INCLUDE_BARRIERS_H */

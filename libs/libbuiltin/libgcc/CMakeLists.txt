@@ -19,6 +19,14 @@
 # ##############################################################################
 
 if(CONFIG_PROFILE_MINI)
-  nuttx_add_system_library(libgprof)
-  target_sources(libgprof PRIVATE profile.c)
+  nuttx_add_system_library(libprofile)
+  target_sources(libprofile PRIVATE profile.c)
+endif()
+
+if(CONFIG_COVERAGE_MINI AND CONFIG_ARCH_TOOLCHAIN_GCC)
+  nuttx_add_system_library(libcoverage)
+  target_compile_options(
+    libcoverage PRIVATE -fno-profile-arcs -fno-test-coverage
+                        -fno-stack-protector)
+  target_sources(libcoverage PRIVATE gcov.c)
 endif()

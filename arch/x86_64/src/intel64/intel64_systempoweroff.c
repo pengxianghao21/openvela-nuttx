@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm/src/armv7-m/barriers.h
+ * arch/x86_64/src/intel64/intel64_systempoweroff.c
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,25 +18,50 @@
  *
  ****************************************************************************/
 
-#ifndef __ARCH_ARM_SRC_ARMV7_M_BARRIERS_H
-#define __ARCH_ARM_SRC_ARMV7_M_BARRIERS_H
-
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
+#include <nuttx/config.h>
+
+#include <nuttx/arch.h>
+#include <arch/io.h>
+
+#include <stdint.h>
+#include <arch/acpi.h>
+
 /****************************************************************************
- * Pre-processor Definitions
+ * Public Data
  ****************************************************************************/
 
-/* ARMv7-M memory barriers */
+/****************************************************************************
+ * Public Functions
+ ****************************************************************************/
 
-#define arm_dsb()  __asm__ __volatile__ ("dsb " : : : "memory")
-#define arm_isb()  __asm__ __volatile__ ("isb " : : : "memory")
-#define arm_dmb()  __asm__ __volatile__ ("dmb " : : : "memory")
+/****************************************************************************
+ * Name: up_systempoweroff
+ *
+ * Description:
+ *   Internal, intel64 poweroff logic.
+ *
+ ****************************************************************************/
 
-#define ARM_DSB()  arm_dsb()
-#define ARM_ISB()  arm_isb()
-#define ARM_DMB()  arm_dmb()
+void up_systempoweroff(void)
+{
+  uint32_t pm1a_cnt = 0;
+  uint32_t pm1b_cnt = 0;
+  uint32_t regvala  = 0;
+  uint32_t regvalb  = 0;
 
-#endif /* __ARCH_ARM_SRC_ARMV7_M_BARRIERS_H */
+  acpi_poweroff_param_get(&pm1a_cnt, &pm1b_cnt, &regvala, &regvalb);
+
+  /* Write to Poweroff Control Register */
+
+  outw(regvala | 0x2000, pm1a_cnt);
+  if (pm1b_cnt != 0)
+    {
+      outw(regvalb | 0x2000, pm1b_cnt);
+    }
+
+  while (1);
+}

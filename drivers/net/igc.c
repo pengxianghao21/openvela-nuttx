@@ -40,6 +40,8 @@
 #include <nuttx/pci/pci.h>
 #include <nuttx/net/igc.h>
 
+#include <arch/barriers.h>
+
 #include "igc.h"
 
 /*****************************************************************************
@@ -205,7 +207,6 @@ static int igc_probe(FAR struct pci_device_s *dev);
  * Private Data
  *****************************************************************************/
 
-#ifdef CONFIG_NET_IGC_I225LM
 /* Intel I225LM */
 
 static const struct igc_type_s g_igc_i225lm =
@@ -213,16 +214,23 @@ static const struct igc_type_s g_igc_i225lm =
   .desc_align = 128,
   .mta_regs   = 128
 };
-#endif
+
+static const struct igc_type_s g_igc_i226v =
+{
+  .desc_align = 128,
+  .mta_regs   = 128
+};
 
 static const struct pci_device_id_s g_igc_id_table[] =
 {
-#ifdef CONFIG_NET_IGC_I225LM
   {
     PCI_DEVICE(0x8086, 0x15f2),
     .driver_data = (uintptr_t)&g_igc_i225lm
   },
-#endif
+  {
+    PCI_DEVICE(0x8086, 0x125c),
+    .driver_data = (uintptr_t)&g_igc_i226v
+  },
   { }
 };
 
@@ -467,7 +475,7 @@ static int igc_transmit(FAR struct netdev_lowerhalf_s *dev,
   priv->tx[desc].cso    = 0;
   priv->tx[desc].status = 0;
 
-  SP_DSB();
+  UP_DSB();
 
   /* Update TX tail */
 

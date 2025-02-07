@@ -1,5 +1,5 @@
 /****************************************************************************
- * arch/arm64/src/common/barriers.h
+ * arch/arm/include/armv7-r/barriers.h
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -18,43 +18,29 @@
  *
  ****************************************************************************/
 
-#ifndef ___ARCH_ARM64_SRC_COMMON_BARRIERS_H
-#define ___ARCH_ARM64_SRC_COMMON_BARRIERS_H
+#ifndef __ARCH_ARM_INCLUDE_ARMV7_R_BARRIERS_H
+#define __ARCH_ARM_INCLUDE_ARMV7_R_BARRIERS_H
 
 /****************************************************************************
  * Included Files
  ****************************************************************************/
 
-#ifndef __ASSEMBLY__
-
 /****************************************************************************
  * Pre-processor Definitions
  ****************************************************************************/
 
-/* See Arm® Architecture Reference Manual
- * ARM DDI 0487E.a C6.2.81
- */
+/* ARMv7-R memory barriers */
 
-#define __DSB(arg) __asm__ volatile ("dsb " #arg : : : "memory");
+#define arm_dsb(n) __asm__ __volatile__ ("dsb " #n : : : "memory")
+#define arm_dmb(n) __asm__ __volatile__ ("dmb " #n : : : "memory")
+#define arm_isb()  __asm__ __volatile__ ("isb " : : : "memory")
+#define arm_nop()  __asm__ __volatile__ ("nop\n")
+#define arm_sev()  __asm__ __volatile__ ("sev\n")
 
-/* See Arm® Architecture Reference Manual
- * ARM DDI 0487E.a C6.2.79
- */
+#define UP_DSB()  arm_dsb(15)
+#define UP_DMB()  arm_dmb(15)
+#define UP_ISB()  arm_isb()
+#define UP_NOP()  arm_nop()
+#define UP_SEV()  arm_sev()
 
-#define __DMB(arg) __asm__ volatile ("dmb " #arg : : : "memory");
-
-/* See Arm® Architecture Reference Manual
- * ARM DDI 0487E.a C6.2.96
- */
-
-#define __ISB()    __asm__ volatile ("isb" : : : "memory");
-
-/* THe most common barriers */
-
-#define ARM64_DSB()  __DSB(sy)
-#define ARM64_DMB()  __DMB(sy)
-#define ARM64_ISB()  __ISB()
-
-#endif /* __ASSEMBLY__ */
-
-#endif /* ___ARCH_ARM64_SRC_COMMON_BARRIERS_H */
+#endif /* __ARCH_ARM_INCLUDE_ARMV7_R_BARRIERS_H */
